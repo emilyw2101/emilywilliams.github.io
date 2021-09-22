@@ -1,0 +1,541 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Assignment 3. Working with Data Frame. Base R Style},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Assignment 3. Working with Data Frame. Base R Style}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\textbf{\emph{Note}:} \emph{This assignment practices working with Data
+Frame using Base R.}
+
+\textbf{\emph{How to do it?}}:
+
+\begin{itemize}
+\item
+  Open the Rmarkdown file of this assignment
+  (\href{fa2021_assignment3.Rmd}{link}) in Rstudio.
+\item
+  Right under each question, insert a code chunk (you can use the hotkey
+  \texttt{Ctrl\ +\ Alt\ +\ I} to add a code chunk) and code the solution
+  for the question.
+\item
+  \texttt{Knit} the rmarkdown file (hotkey: \texttt{Ctrl\ +\ Alt\ +\ K})
+  to export an html.
+\item
+  Publish the html file to your Githiub Page.
+\end{itemize}
+
+\textbf{\emph{Submission}}: Submit the link on Github of the assignment
+to Canvas under Assignment 3.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{problems}{%
+\subsection{Problems}\label{problems}}
+
+\hfill\break
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Create the following data frame
+\end{enumerate}
+
+\begin{longtable}[]{@{}lll@{}}
+\toprule
+Rank & Age & Name \\
+\midrule
+\endhead
+0 & 28 & Tom \\
+1 & 34 & Jack \\
+2 & 29 & Steve \\
+3 & 42 & Ricky \\
+\bottomrule
+\end{longtable}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OtherTok{=} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{Rank =} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}0\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}1\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}2\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}3\textquotesingle{}}\NormalTok{), }\AttributeTok{Age =} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}28\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}34\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}29\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}42\textquotesingle{}}\NormalTok{), }\AttributeTok{Name =} \FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}Tom\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}Jack\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}Steve\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}Ricky\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Use \texttt{read.csv} to import the Covid19 Vaccination data from WHO:
+  \href{https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv}{link}
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df }\OtherTok{\textless{}{-}} \FunctionTok{read.csv}\NormalTok{(}\StringTok{\textquotesingle{}https://raw.githubusercontent.com/nytimes/covid{-}19{-}data/master/us{-}states.csv\textquotesingle{}}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+Show the names of the variables in the data
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "date"   "state"  "fips"   "cases"  "deaths"
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  How many columns and rows the data have?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 'data.frame':    31254 obs. of  5 variables:
+##  $ date  : chr  "2020-01-21" "2020-01-22" "2020-01-23" "2020-01-24" ...
+##  $ state : chr  "Washington" "Washington" "Washington" "Illinois" ...
+##  $ fips  : int  53 53 53 17 53 6 17 53 4 6 ...
+##  $ cases : int  1 1 1 1 1 1 1 1 1 2 ...
+##  $ deaths: int  0 0 0 0 0 0 0 0 0 0 ...
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  How many missing values are there? Show the missing values by columns.
+  What variable has the most number of missing values?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sum}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{colSums}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(df))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   date  state   fips  cases deaths 
+##      0      0      0      0      0
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  What is the class of the \texttt{date} column. Change the
+  \texttt{date} columns to \texttt{date} type using the \texttt{as.Date}
+  function. Show the new class of the \texttt{date} column.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{class}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{date)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "character"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{date }\OtherTok{=} \FunctionTok{as.Date}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{date)}
+\FunctionTok{class}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{date)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Date"
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\tightlist
+\item
+  Capitalize the names of all the variables
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{names}\NormalTok{(df)[}\DecValTok{1}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}Date\textquotesingle{}}
+\FunctionTok{names}\NormalTok{(df)[}\DecValTok{2}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}State\textquotesingle{}}
+\FunctionTok{names}\NormalTok{(df)[}\DecValTok{3}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}Fips\textquotesingle{}}
+\FunctionTok{names}\NormalTok{(df)[}\DecValTok{4}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}Cases\textquotesingle{}}
+\FunctionTok{names}\NormalTok{(df)[}\DecValTok{5}\NormalTok{] }\OtherTok{\textless{}{-}} \StringTok{\textquotesingle{}Deaths\textquotesingle{}}
+\FunctionTok{names}\NormalTok{(df)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Date"   "State"  "Fips"   "Cases"  "Deaths"
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\tightlist
+\item
+  Find the average number of cases per day. Find the maximum cases a
+  day.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mean}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Cases, }\AttributeTok{na.rm=}\ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 325915.5
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{max}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Cases, }\AttributeTok{na.rm=}\ConstantTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 4669895
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{7}
+\tightlist
+\item
+  How many states are there in the data?
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{table}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{State)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##                  Alabama                   Alaska                  Arizona 
+##                      558                      559                      605 
+##                 Arkansas               California                 Colorado 
+##                      560                      606                      566 
+##              Connecticut                 Delaware     District of Columbia 
+##                      563                      560                      564 
+##                  Florida                  Georgia                     Guam 
+##                      570                      569                      556 
+##                   Hawaii                    Idaho                 Illinois 
+##                      565                      558                      607 
+##                  Indiana                     Iowa                   Kansas 
+##                      565                      563                      564 
+##                 Kentucky                Louisiana                    Maine 
+##                      565                      562                      559 
+##                 Maryland            Massachusetts                 Michigan 
+##                      566                      599                      561 
+##                Minnesota              Mississippi                 Missouri 
+##                      565                      560                      564 
+##                  Montana                 Nebraska                   Nevada 
+##                      558                      583                      566 
+##            New Hampshire               New Jersey               New Mexico 
+##                      569                      567                      560 
+##                 New York           North Carolina             North Dakota 
+##                      570                      568                      560 
+## Northern Mariana Islands                     Ohio                 Oklahoma 
+##                      543                      562                      565 
+##                   Oregon             Pennsylvania              Puerto Rico 
+##                      572                      565                      558 
+##             Rhode Island           South Carolina             South Dakota 
+##                      570                      565                      561 
+##                Tennessee                    Texas                     Utah 
+##                      566                      588                      575 
+##                  Vermont           Virgin Islands                 Virginia 
+##                      564                      557                      564 
+##               Washington            West Virginia                Wisconsin 
+##                      610                      554                      595 
+##                  Wyoming 
+##                      560
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{8}
+\tightlist
+\item
+  Create a new variable \texttt{weekdays} to store the weekday for each
+  rows.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{Weekdays }\OtherTok{\textless{}{-}} \FunctionTok{weekdays}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Date)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{9}
+\tightlist
+\item
+  Create the categorical variable \texttt{death2} variable taking the
+  values as follows
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  \texttt{has\_death} if there is a death that day
+\item
+  \texttt{no\_death} if there is no death that day
+\end{itemize}
+
+Find the frequency and relative frequency of \texttt{no\_death} and
+\texttt{has\_death}.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{death2 }\OtherTok{\textless{}{-}} \FunctionTok{ifelse}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Deaths}\SpecialCharTok{==}\DecValTok{0}\NormalTok{,}\StringTok{\textquotesingle{}no\_death\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}has\_death\textquotesingle{}}\NormalTok{)}
+\FunctionTok{table}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Death2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## < table of extent 0 >
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{10}
+\tightlist
+\item
+  Find the first quartile (Q1), second quartile (Q2) and and third
+  quartile (Q3) of the variable \texttt{death}. (Hint: Use the
+  \texttt{summary} function)
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Deaths)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##       0     365    2087    6204    7386   68244
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{11}
+\tightlist
+\item
+  Create the categorical variable \texttt{death3} variable taking the
+  values as follows
+\end{enumerate}
+
+\begin{itemize}
+\item
+  \texttt{low\_death} if the number of deaths smaller than the 25
+  percentile (Q1)
+\item
+  \texttt{mid\_death} if the number of deaths from Q1 to Q3
+\item
+  \texttt{high\_death} if the number of deaths greater than Q3
+\end{itemize}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df}\SpecialCharTok{$}\NormalTok{death3 }\OtherTok{\textless{}{-}} \FunctionTok{cut}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{Deaths, }\AttributeTok{breaks=}\FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{363}\NormalTok{,}\DecValTok{6183}\NormalTok{,}\ConstantTok{Inf}\NormalTok{), }\AttributeTok{labels=}\FunctionTok{c}\NormalTok{(}\StringTok{\textquotesingle{}low\_death\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}mid\_death\textquotesingle{}}\NormalTok{,}\StringTok{\textquotesingle{}high\_death\textquotesingle{}}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{12}
+\tightlist
+\item
+  Find the average cases in Rhode Island in 2021
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df1 }\OtherTok{\textless{}{-}}\NormalTok{ df[df}\SpecialCharTok{$}\NormalTok{Date\_report}\SpecialCharTok{\textgreater{}=}\StringTok{\textquotesingle{}2021{-}01{-}01\textquotesingle{}}\NormalTok{,]}
+\FunctionTok{by}\NormalTok{(df1}\SpecialCharTok{$}\NormalTok{New\_cases, df1}\SpecialCharTok{$}\NormalTok{WHO\_region, mean)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{13}
+\tightlist
+\item
+  Find the median cases by weekdays in Rhode Island in 2021
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{str}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{State)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  chr [1:31254] "Washington" "Washington" "Washington" "Illinois" ...
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{14}
+\tightlist
+\item
+  Compare the median cases in Rhode Island in June, July, August and
+  September in 2021.
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{head}\NormalTok{(df}\SpecialCharTok{$}\NormalTok{State)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] "Washington" "Washington" "Washington" "Illinois"   "Washington"
+## [6] "California"
+\end{verbatim}
+
+\end{document}

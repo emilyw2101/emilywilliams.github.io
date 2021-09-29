@@ -63,6 +63,8 @@ class(df$date)
 
 ```{r}
 library(lubridate)
+df$date <- ymd(df$date)
+
 df$month = month(df$date)
 
 # day of the week
@@ -79,23 +81,26 @@ df$monthday <- mday(df$date)
 The function `case_when` is a good option to create a new variable from existing variable.  For example, this below codes create a new variable, `daily_death`, from `deathIncrease` variable.  `deathIncrease` is the number of daily new death by Covid19.  The new variable `daily_death` takes three values:  low (if `deathIncrease` less than 3), medium (`deathIncrease` from 3 to 14), and high (`deathIncrease` more than 14).  Please notice that this can also be done in a different way as shown in Assignment 3. 
 
 ```{r}
-df$daily_death <- case_when(df$deathIncrease <3 ~ 'low',df$deathIncrease <=14 ~ 'medium',TRUE ~ 'high')
+df$daily_death <- case_when(df$deathIncrease <3 ~ 'low',
+                            df$deathIncrease <=14 ~ 'medium',
+                            TRUE ~ 'high')
 ```
 
 - Create variable `month2` that takes three values: early_month (day of the month from 1-10), mid_month (day of the month from 11-20), and end_month (day of the month > 20).
 
 ```{r}
-df$month2 <- case_when(df$monthday <10 ~ 'early_month', df$monthday <=20 ~ 'mid_month', TRUE ~ 'end_month')
+df$month2 <- case_when(df$monthday <10 ~ 'early_month', 
+                       df$monthday <=20 ~ 'mid_month', 
+                       TRUE ~ 'end_month')
 ```
 
 
 - Create variable `weekend` that takes two values:  1 if it's Saturday or Sunday or 0 otherwise. 
 
 ```{r}
-
+df$weekend <- case_when(df$weekday > 5 ~ '1', 
+                        TRUE ~ '0')
 ```
-
-
 -------
 
 #### 5. Select function
@@ -105,7 +110,6 @@ Use the select function to deselect the column `totalTestsViral` from the data.
 ```{r}
 df2 <- select(df, -totalTestsViral)
 ```
-
 
 -------
 
@@ -124,10 +128,11 @@ sum(sqrt(x))
 x %>% sum(x)
 
 log(sum(sqrt(x)))
+x %>% sqrt %>% sum %>% log
 
 # log base 2 of 16
 log(16, 2)
-
+x %>% log
 ```
 
 -------
@@ -136,18 +141,32 @@ log(16, 2)
 
 This combo is used when you want to apply a function/calculation to different groups of the data. For example, to calculate the average number of cases (`positiveIncrease`) by `dataQualityGrade`, we use:
 
-```{r, eval=FALSE}
+```{r}
 df %>% 
-  group_by(weekday) %>% 
+  group_by(weekend) %>% 
   summarise(mean(positiveIncrease))
 ```
 
 - Calculate the median number of cases (`positiveIncrease`) by `month`
+```{r}
+df %>% 
+  group_by(month) %>% 
+  summarise(median(positiveIncrease))
+```
 
 - Calculate the average number of cases (`positiveIncrease`) by `month2`
+```{r}
+ df %>% 
+  group_by(month2) %>% 
+  summarise(mean(positiveIncrease))
+```
 
 - Calculate the median number of cases (`positiveIncrease`) by `weekend`
-
+```{r}
+df %>% 
+    group_by(weekend) %>% 
+    summarise(median(positiveIncrease))
+```
 
 -------
 
@@ -155,7 +174,7 @@ df %>%
 
 An example: to calculate the average number of cases (`positiveIncrease`) in January and February separately, we use:
 
-```{r, eval=FALSE}
+```{r}
 df %>% 
   filter(month==1|month==2) %>% 
   group_by(month) %>% 
@@ -163,10 +182,28 @@ df %>%
 ```
 
 - Calculate the median number of cases (`positiveIncrease`) on the weekend by `month` in October and November 2020. 
+```{r}
+df %>% 
+  filter(date>='2020-10-01', date<='2020-11-30') %>% 
+  group_by(weekend) %>% 
+  summarise(positve_increase = median(positiveIncrease))
+```
 
 - Calculate the average number of death at different periods of a month (`month2` variable) in Fall 2020
+```{r}
+df %>% 
+  filter(date>=2020-09-20, date<=2020-12-21) %>% 
+  group_by(month2) %>% 
+  summarise(deathIncrease = mean(deathIncrease))
+```
 
 - Compare the average number of hospitalizations between weekdays and weekends in Summer 2020
+```{r}
+df %>% 
+  filter(date>='2020-5-20', date<='2020-09-20') %>% 
+  group_by(weekend) %>% 
+  summarise(hospitalizedIncrease = mean(hospitalizedIncrease))
+```
 
 - Redo Questions 14 and 15 in [Assignment 3](fa2021_assignment3.html) using the combos.  Notice:  you also need to use the data used in Assignment 3.  
 
@@ -175,3 +212,10 @@ df %>%
 #### 9. Combo 2: filter + group_by + summarise + arrange
 
 Use the arrange function to find a month that has the highest number of deaths on the weekend. 
+```{r}
+df %>% 
+    filter(date>='2020-01-01', date>='2020-12-31') %>% 
+    group_by(weekend) %>% 
+    summarise(avg_deaths = mean(death)) %>% 
+    arrange(-avg_deaths)
+```

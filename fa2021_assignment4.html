@@ -198,11 +198,16 @@ pre code {
 <li>Use the following codes to change the type of the <code>date</code> column to <code>date</code>.</li>
 </ul>
 <pre class="r"><code>library(lubridate)
-df$date &lt;- ymd(df$date)</code></pre>
+class(df$date)</code></pre>
+<pre><code>## [1] &quot;Date&quot;</code></pre>
+<pre class="r"><code>df$date = as.Date(df$date)
+class(df$date)</code></pre>
+<pre><code>## [1] &quot;Date&quot;</code></pre>
 <ul>
 <li>Use the below codes to create <code>month</code>, <code>weekday</code> and <code>monthday</code> variables</li>
 </ul>
-<pre class="r"><code>df$month = month(df$date)
+<pre class="r"><code>library(lubridate)
+df$month = month(df$date)
 
 # day of the week
 df$weekday = wday(df$date)
@@ -214,20 +219,20 @@ df$monthday &lt;- mday(df$date)</code></pre>
 <div id="create-new-variables-with-case_when." class="section level4">
 <h4>4. Create new variables with <code>case_when</code>.</h4>
 <p>The function <code>case_when</code> is a good option to create a new variable from existing variable. For example, this below codes create a new variable, <code>daily_death</code>, from <code>deathIncrease</code> variable. <code>deathIncrease</code> is the number of daily new death by Covid19. The new variable <code>daily_death</code> takes three values: low (if <code>deathIncrease</code> less than 3), medium (<code>deathIncrease</code> from 3 to 14), and high (<code>deathIncrease</code> more than 14). Please notice that this can also be done in a different way as shown in Assignment 3.</p>
-<pre class="r"><code>df$daily_death &lt;- case_when(
-  df$deathIncrease &lt;3 ~ &#39;low&#39;,
-  df$deathIncrease &lt;=14 ~ &#39;medium&#39;,
-  TRUE ~ &#39;high&#39;
-)</code></pre>
+<pre class="r"><code>df$daily_death &lt;- case_when(df$deathIncrease &lt;3 ~ &#39;low&#39;,df$deathIncrease &lt;=14 ~ &#39;medium&#39;,TRUE ~ &#39;high&#39;)</code></pre>
 <ul>
-<li><p>Create variable <code>month2</code> that takes three values: early_month (day of the month from 1-10), mid_month (day of the month from 11-20), and end_month (day of the month &gt; 20).</p></li>
-<li><p>Create variable <code>weekend</code> that takes two values: 1 if it’s Saturday or Sunday or 0 otherwise.</p></li>
+<li>Create variable <code>month2</code> that takes three values: early_month (day of the month from 1-10), mid_month (day of the month from 11-20), and end_month (day of the month &gt; 20).</li>
+</ul>
+<pre class="r"><code>df$month2 &lt;- case_when(df$monthday &lt;10 ~ &#39;early_month&#39;, df$monthday &lt;=20 ~ &#39;mid_month&#39;, TRUE ~ &#39;end_month&#39;)</code></pre>
+<ul>
+<li>Create variable <code>weekend</code> that takes two values: 1 if it’s Saturday or Sunday or 0 otherwise.</li>
 </ul>
 <hr />
 </div>
 <div id="select-function" class="section level4">
 <h4>5. Select function</h4>
 <p>Use the select function to deselect the column <code>totalTestsViral</code> from the data.</p>
+<pre class="r"><code>df2 &lt;- select(df, -totalTestsViral)</code></pre>
 <hr />
 </div>
 <div id="pipe-operator" class="section level4">

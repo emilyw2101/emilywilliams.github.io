@@ -241,14 +241,20 @@ df$monthday &lt;- mday(df$date)</code></pre>
 <pre class="r"><code>x &lt;- c(1:10)
 
 # square root of x
-sqrt(x)
-
-sum(sqrt(x))
-
-log(sum(sqrt(x)))
-
-# log base 2 of 16
+sqrt(x)</code></pre>
+<pre><code>##  [1] 1.000000 1.414214 1.732051 2.000000 2.236068 2.449490 2.645751 2.828427
+##  [9] 3.000000 3.162278</code></pre>
+<pre class="r"><code>x %&gt;% sum</code></pre>
+<pre><code>## [1] 55</code></pre>
+<pre class="r"><code>sum(sqrt(x))</code></pre>
+<pre><code>## [1] 22.46828</code></pre>
+<pre class="r"><code>x %&gt;% sum(x)</code></pre>
+<pre><code>## [1] 110</code></pre>
+<pre class="r"><code>log(sum(sqrt(x)))</code></pre>
+<pre><code>## [1] 3.112104</code></pre>
+<pre class="r"><code># log base 2 of 16
 log(16, 2)</code></pre>
+<pre><code>## [1] 4</code></pre>
 <hr />
 </div>
 <div id="combo-1-group_by-summarise" class="section level4">

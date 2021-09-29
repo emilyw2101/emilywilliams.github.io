@@ -113,13 +113,15 @@ df2 <- select(df, -totalTestsViral)
 
 Pipe operator offers another way to write R codes. Many times, it makes the codes more readable.  Pipe works very well with all the `tidyverse` packages. Refer to [these slides](file:///C:/Users/sonou/Dropbox/git/math421/slides/dplyr.html#15) (slide 15, 16, 17 and 18) to rewrite the below codes using pipe operator
 
-```{r, eval=FALSE}
+```{r}
 x <- c(1:10)
 
 # square root of x
 sqrt(x)
+x %>% sum
 
 sum(sqrt(x))
+x %>% sum(x)
 
 log(sum(sqrt(x)))
 

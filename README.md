@@ -11,3 +11,7 @@
 [Click here for Assignment 5](fa2021_assignment5.html)
 
 [Click here for Assignment 6](fa2021_assignment6.html)
+
+[Click here for Assignment 7](fa2021_assignment7.html)
+
+[Link to Assignment 7 Plot](abc.png)

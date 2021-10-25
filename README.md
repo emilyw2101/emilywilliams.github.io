@@ -17,3 +17,5 @@
 [Link to Assignment 7 Plot](abc.png)
 
 [Click here for Assignment 8](fa2021_assignment8.html)
+
+[Click here for Assignment 9](fa2021_assignment9.html)

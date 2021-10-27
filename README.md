@@ -20,6 +20,6 @@
 
 [Click here for Assignment 9](fa2021_assignment9.html)
 
-[Click here for Assignment 10](fa2021_assignment10.html)
+[Click here for Assignment 10](1fa2021_assignment10.html)
 
-[Click here for Assignment 11](1fa2021_assignment11.html)
+[Click here for Assignment 11](fa2021_assignment11.html)

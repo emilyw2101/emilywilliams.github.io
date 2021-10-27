@@ -56,6 +56,7 @@ splitIndex <- createDataPartition(df$target, p = .80, list = FALSE)
 df_train <-  df[ splitIndex,]
 df_test <- df[ -splitIndex,]
 ```
+
 -------
 
 2. Practice Decision Tree.  Do the follows:
@@ -67,6 +68,7 @@ df_test <- df[ -splitIndex,]
   - Plot the tree
   
   - Plot the variable importance by the tree
+  
 ```{r}
 library(rpart)
 tree_model <- rpart(target ~ ., data = df_train, control = rpart.control(maxdepth = 3))
@@ -74,6 +76,7 @@ library(rattle)
 fancyRpartPlot(tree_model)
 tree_model$variable_importance
 ```
+
 
 -------
 
@@ -89,7 +92,7 @@ tree_model$variable_importance
 library(randomForest)
 forest_model = randomForest(target ~ ., data=df_train, ntree = 1000)
 pred <- predict(forest_model, df_test, type = "class")
-cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "1")
+cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
 cm$overall[1]
 
 forest_model$importance
@@ -99,20 +102,23 @@ plot(forest_model)
 
 -------
 
-4. Compare the testing accuracy of a forest of 1000 trees and a forest of 2000 trees. 
+4. Compare the testing accuracy of a forest of 1000 trees and a forest of 2000 trees.
+
 ```{r}
-model2 <- train(target~., data=df_train, 
+library(caret)
+library(randomForest)
+model1 <- train(target~., data=df_train, 
                 method = "rf",
-                ntree = 1000) 
-pred <- predict(model2, df_test)
-cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "1")
+                ntree = 1000)
+pred <- predict(model1, df_test)
+cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
 cm$overall[1]
 
 model2 <- train(target~., data=df_train, 
                 method = "rf",
-                ntree = 2000) 
+                ntree = 2000)
 pred <- predict(model2, df_test)
-cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "1")
+cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
 cm$overall[1]
 
 varImp(model1)
@@ -121,24 +127,31 @@ varImp(model2)
 plot(varImp(model1))
 plot(varImp(model2))
 ```
+
 
 -------
 
 5. Using Caret, create a tree with maximum depth of 3 and forest of 1000 trees. Compare the accuracy of these two models.
+
+-------
+
 6. Plot variable importance by the two models in 5. 
+
 ```{r}
+library(randomForest)
+library(caret)
 model1 <- train(target~., data=df_train, 
                 method = "rpart2",
                 maxdepth=3)
 pred <- predict(model1, df_test)
-cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "1")
+cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
 cm$overall[1]
 
 model2 <- train(target~., data=df_train, 
                 method = "rf",
                 ntree = 1000) 
 pred <- predict(model2, df_test)
-cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "1")
+cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
 cm$overall[1]
 
 varImp(model1)
@@ -147,6 +160,7 @@ varImp(model2)
 plot(varImp(model1))
 plot(varImp(model2))
 ```
+
 
 -------
 

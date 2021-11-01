@@ -24,4 +24,4 @@
 
 [Click here for Assignment 11](fa2021_assignment11.html)
 
-[Click here for Assignment 12](fa2021_assignment12.hmtl)
+[Click here for Assignment 12](fa2021_assignment12.html)

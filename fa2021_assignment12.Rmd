@@ -61,21 +61,174 @@ df_test <- df[ -splitIndex,]
 
 2. Use cross-validation of 30 folds to tune random forest (method='rf').  What is the `mtry` value that produces the greatest accuracy?
  
+```{r}
+library(caret)
+library(tidyverse)
+library(rpart)
+getModelInfo('rf')$rf$parameters
+tuneGrid = expand.grid(mtry = 2:4)
+trControl = trainControl(method = "cv", number = 3)
+forest_rf <- train(target~., data=df_train, 
+                                method = "rf", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
+plot(forest_rf)
+
+
+pred <- predict(forest_rf, df_test)
+cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
+cm$overall[1]
+```
+
 -------
 
 3. Use cross-validation with of 30 folds to tune random forest (method='ranger').  What are the parameters that produce the greatest accuracy?
 
--------
+```{r}
+library(ranger)
+getModelInfo('ranger')$ranger$parameters
+trControl = trainControl(method = "cv",
+                         number = 3)
+tuneGrid = expand.grid(mtry = 2:4,
+                       splitrule = c('gini', 'extratrees'),
+                       min.node.size = c(1:30))
+forest_ranger <- train(target~., data=df_train, 
+                    method = "ranger", 
+                    trControl = trControl,
+                    tuneGrid = tuneGrid)
+plot(forest_ranger)
+```
 
+```{r}
+pred <- predict(forest_ranger, df_test)
+cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
+cm$overall[1]
+```
+
+-------
 4. Go to https://topepo.github.io/caret/available-models.html and pick a classification model.  Tune the classification model using cross-validation of 30 folds. 
+```{r}
+library(caret)
+getModelInfo('ranger')$ranger$parameters
+tuneGrid = expand.grid(mtry = 2:4)
+trControl = trainControl(method = "cv",
+                         number = 3)
+forest_rf <- train(target~., data=df_train, 
+                                method = "rf", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
+```
 
 -------
 
 5. Pick three models at [this link](https://topepo.github.io/caret/available-models.html) to compare using 15-fold cross validation method. Evaluate the accuracy of the final model on the test data. What is the best model?
+```{r}
+library(rpart)
+library(caret)
+library(tidyverse)
+library(ranger)
+trControl = trainControl(method = "cv",
+                         number = 3)
+tree <- train(target~., data=df_train, 
+                                method = "rpart2", 
+                                trControl = trControl)
+forest_ranger <- train(target~., data=df_train, 
+                    method = "ranger", 
+                                trControl = trControl)
+
+lda <- train(target~., data=df_train, 
+                                method = "lda", 
+                                trControl = trControl)
+results <- resamples(list('Decision Tree' = tree,
+                          'Random Forest' = forest_ranger,
+                          'LDA'= lda))
+
+bwplot(results)
+
+```
 
 -------
-
 6. Redo Question 5 on this following dataset. 
 
  - `Adult Census Income` dataset ([Link](https://www.kaggle.com/uciml/adult-census-income)) where the target variable is `income`
+ 
+```{r}
+library(mlbench)
+library(caret)
+library(rpart)
+df6 <- read.csv("C:/Users/student/Downloads/adult.csv")
+
+set.seed(2020)
+
+names(df6)[15] <- 'target'
+
+df6$target <- factor(df6$target)
+
+df6$age[is.na(df6$age)] = mean(df6$age, na.rm = TRUE)
+
+splitIndex <- createDataPartition(df6$target, p = .80, list = FALSE)
+df6_train <-  df6[ splitIndex,]
+df6_test <- df6[ -splitIndex,]
+library(rpart)
+library(caret)
+library(tidyverse)
+library(ranger)
+trControl = trainControl(method = "cv",
+                         number = 3)
+tree <- train(target~., data=df6_train, 
+                                method = "rpart2", 
+                                trControl = trControl)
+forest_ranger <- train(target~., data=df6_train, 
+                    method = "ranger", 
+                                trControl = trControl)
+
+lda <- train(target~., data=df6_train, 
+                                method = "lda", 
+                                trControl = trControl)
+results <- resamples(list('Decision Tree' = tree,
+                          'Random Forest' = forest_ranger,
+                          'LDA'= lda))
+
+bwplot(results)
+```
+
+
  -  `Credit card default` dataset ([link](https://www.kaggle.com/uciml/default-of-credit-card-clients-dataset)) where the target variable is `default.payment.next.month`
+```{r}
+library(mlbench)
+library(caret)
+library(rpart)
+df7 <- read.csv("C:/Users/student/Downloads/UCI_Credit_Card.csv")
+set.seed(2020)
+
+names(df7)[25] <- 'target'
+
+df7$target <- factor(df7$target)
+df7$AGE[is.na(df7$AGE)] = mean(df7$AGE, na.rm = TRUE)
+
+splitIndex <- createDataPartition(df7$target, p = .80, list = FALSE)
+df7_train <-  df7[ splitIndex,]
+df7_test <- df7[ -splitIndex,]
+
+
+library(rpart)
+library(caret)
+library(tidyverse)
+library(ranger)
+trControl = trainControl(method = "cv",
+                         number = 3)
+tree <- train(target~., data=df7_train, 
+                                method = "rpart2", 
+                                trControl = trControl)
+forest_ranger <- train(target~., data=df7_train, 
+                    method = "ranger", 
+                                trControl = trControl)
+
+lda <- train(target~., data=df6_train, 
+                                method = "lda", 
+                                trControl = trControl)
+results <- resamples(list('Decision Tree' = tree,
+                          'Random Forest' = forest_ranger,
+                          'LDA'= lda))
+bwplot(results)
+```

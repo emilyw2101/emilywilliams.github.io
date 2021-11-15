@@ -25,3 +25,8 @@
 [Click here for Assignment 11](fa2021_assignment11.html)
 
 [Click here for Assignment 12](fa2021_assignment12.html)
+
+[Click here for Midterm Project](fa2021_midterm_toc2.html)
+
+[Click here for Midterm Presentation](test.html)
+

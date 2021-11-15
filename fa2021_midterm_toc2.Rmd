@@ -1,0 +1,520 @@
+
+---
+title: "Fall 2021 - Math 421 - Midterm"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+    theme: united
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+---
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## Instruction
+
+The midterm has two components: the Rmarkdown notebook (html) and the presentation.  We will do the presentation in class. Post both the notebook and the presentation on your Github page. 
+
+**The notebook:** The notebook should be created using `rmarkdown` (like other assignments). The notebook should have a title. It should have a table of content (TOC form) or in a tab form. Here are the samples Rmarkdown for [TOC form](fa2021_midterm_toc.Rmd) and [tab form](fa2021_midterm_tab.Rmd)
+
+
+**The Presentation:** Present your results in 5-10 minutes. To make the presentation using Rmarkdown, do the follows: 
+
+    - In Rstudio -> File -> New File -> R markdown
+    
+    - In the left panel, click to Presentation -> Click OK
+    
+    - Now you have an Rmarkdown that can be knitted to be a html presentation 
+    
+- You can also use borrow a template of our class slides presentations. For example, [this slide](https://bryantstats.github.io/math421/slides/6_viz_fa21_2.html) has this [Rmarkdown](https://bryantstats.github.io/math421/slides/6_viz_fa21_2.Rmd). Using the template may require to install missing packages. 
+    
+- You do not need to rerun all the codes for the presentation. For example, to show the model comparison, you just need to show the image of the model comparison instead of running all the models again.
+    
+- To inset an image in a slide, use  `![](image.png)`
+
+- To scale images, you can follow these below instructions. 
+    
+    - https://bookdown.org/yihui/rmarkdown-cookbook/figure-size.html
+    
+    - http://zevross.com/blog/2017/06/19/tips-and-tricks-for-working-with-images-and-figures-in-r-markdown-documents/
+
+- To turn off message and warning of a code cell, use:  `{r, message=FALSE, warning=FALSE}` for the cell. 
+
+**What to present**:
+
+  - Present Part 2 - Visualization
+  
+  - Present Question Question 4, 5 and 6 in Part 3.  
+  
+  - Present any errors/challenges you run into and how you fix/overcome them. 
+
+**Data:**  
+
+The data for the mid-term project is the Rhode Island Department of Health Hospital Discharge Data.  Each row of the data presents a patient. 
+
+Link: https://drive.google.com/open?id=15QNBf6YYKocK2nNIfpKDer58kQnCPNZJ 
+
+-------
+
+## I. Data Wranggling
+
+1. Download the data file `hdd0318cy.sas7bdat`.  
+
+2. Use `read_sas` in library `haven` to read the data. 
+    
+3. Filter the data to have only patients of the year 2018 (`yod=2018`)
+    
+4. Select to work with only following variables: 
+
+```{r, eval=FALSE}
+                      "yod", "payfix","pay_ub92","age",  
+                      "sex","raceethn","provider","moa", 
+                      "yoa","mod","admtype", "asource" , 
+                      "preopday" ,"los", "service" , "icu","ccu",    
+                      "dispub92", "payer"  ,"drg","trandb", 
+                      "randbg","randbs","orr", "anes","seq",   
+                      "lab","dtest", "ther","blood","phar", 
+                      "other","patcon","bwght","total","tot" ,  
+                      "ecodub92","b_wt","pt_state","diag_adm","ancilar" ,
+                      "campus","er_fee","er_chrg","er_mode","obs_chrg",
+                      "obs_hour","psycchrg","nicu_day"
+```
+
+```{r}
+library(haven)
+df <- read_sas('C:/Users/student/Downloads/ewilliamsMATH421/hdd0318cy.sas7bdat')
+```
+
+```{r}
+library(tidyverse)
+df <- df %>% 
+  filter(yod==18)
+```
+
+```{r}
+df2 <-  select(df,"yod", "payfix","pay_ub92","age", "sex","raceethn","provider","moa", "yoa","mod","admtype", "asource","preopday","los", "service" , "icu","ccu","dispub92", "payer"  ,"drg","trandb","randbg","randbs","orr", "anes","seq","lab","dtest", "ther","blood","phar","other","patcon","bwght","total","tot","ecodub92","b_wt","pt_state","diag_adm","ancilar","campus","er_fee","er_chrg","er_mode","obs_chrg","obs_hour","psycchrg","nicu_day")
+```
+
+```{r}
+write_csv(df2, 'midterm.csv')
+```
+
+*Notice*:  You may want to save the current data to your computer for easy access later.  To save the data file use `write_csv(df, 'midterm.csv')`, for example.  
+
+5. What are variables that have missing values?
+```{r}
+library(tidyverse)
+colSums(is.na(df2))
+```
+
+6. Remove all variables with missing values. 
+```{r}
+library(tidyverse)
+df2$nicu_day <- NULL
+df2$preopday <- NULL
+df2$obs_hour <- NULL
+df2$payfix <- NULL
+```
+ 
+7. Refer to the data description in the file `HDD2015-18cy6-20-19.docx`, which variable recording the month of admission?, which variable recording the month of discharge?
+
+
+"moa" is the variable recording the month of admission and mod is the variable recording the month of discharge. 
+
+
+8. Which month admitted the most number of patients? Which month admitted the most number of male patients?
+```{r}
+library(tidyverse)
+
+df3 <- df2 %>% 
+  filter(sex=='1') 
+
+table(df3$moa)
+```
+
+October admitted the highest number of patients. October also admitted the highest number of male patients. 
+
+
+9. Which month has the most number of teenage female patients?
+```{r}
+library(tidyverse)
+df4 <- df2 %>% 
+  filter(sex=='2', age<'20')
+
+table(df4$moa)
+```
+
+May admitted the highest number of teenage female patients. 
+
+
+10. Which provider has the most number of female patients in October? 
+```{r}
+library(tidyverse)
+
+df5 <- df2 %>% 
+  filter(sex=='2', moa=='10')
+
+table(df5$provider)
+```
+
+Provider #7205, "Rhode Island Hospital" admitted the highest number of female patients in October.
+
+
+11. Are female patients older than male patients, on average? 
+```{r}
+library(tidyverse)
+df6 <- df2 %>% 
+  filter(sex=='1') %>% 
+  summarise(avg_age = mean(age))
+
+df7 <- df2 %>% 
+  filter(sex=='2') %>% 
+  summarise(avg_age = mean(age))
+
+table(df6)
+table(df7)
+```
+
+Male patients are older on average by about a year, 51.49 years old in comparison to female patients averaging 50.86 years old. 
+
+
+12. Calculate the average age of patients by months. Which month has the oldest patients on average age?
+```{r}
+library(tidyverse)
+df8 <- df2 %>% 
+  group_by(moa) %>% 
+  summarise(avg_age = mean(age))
+
+table(df8)
+```
+
+January has the oldest patients on average by age, averaging 51.79 years old.
+
+
+13. What is the name of the provider that has the highest total charge?
+```{r}
+library(tidyverse)
+df9 <- df2 %>% 
+  group_by(provider) %>% 
+  summarise(total_charges = mean(tot, na.rm=TRUE)) %>% 
+  arrange(total_charges)
+table(df9)
+```
+
+Provider #7215, "Bradley" has the highest total charge of $69,945.55
+
+
+14. What is the name of the provider that has the least total charge for teenage male on average?
+```{r}
+library(tidyverse)
+df11 <- df2 %>% 
+  filter(sex=='1', age<'20') %>% 
+  group_by(provider) %>% 
+  summarise(least_total_charge = mean(tot, na.rm=TRUE)) %>% 
+  arrange(-least_total_charge)
+```
+
+Provider #7201, "Newport" has the least total charge of $5,790.98 for teenage males, on average. 
+
+
+15. Create a season (Spring, Summer, Fall, Winter) variable. Calculate the length of stays by season.  Which season has the longest length of stays on average?
+```{r}
+library(tidyverse)
+df2$season <- cut(df$moa, 
+                      breaks = c(-Inf, 3, 6, 9, Inf), 
+                      labels=c('winter','spring','summer','fall'))
+table(df2$season)
+  
+df2 %>% 
+  group_by(season) %>% 
+  summarise(length_of_stay = mean(los, na.rm=TRUE)) %>% 
+  arrange(-length_of_stay)
+```
+
+Visitors in the fall had the longest average length of stay at 4.99 days per visit. 
+
+
+16. On average, how much a 20 year-old male get charged for staying 1 day in the Fall season?
+```{r}
+library(tidyverse)
+df2 %>% 
+  filter(sex=='1', age=='20', season=='fall', los=='1') %>% 
+  summarise(avg_total_charge = mean(tot, na.rm=TRUE)) %>% 
+  arrange(avg_total_charge)
+```
+
+On average, a 20 year old male get charged $16,511 for a 1-day stay in the hospital. 
+
+
+17. Write a paragraph to summarize the section and give your comments on the results. You could do some other calculations to support your points. 
+The overall data is quite a bit to take in. When I use a new dataset, calling it ‘df2’, with fewer variables and taking out missing values, the data is easier to comprehend. I find this dataset interesting, especially because this is real-life data that was recorded just a few years ago. One of the most interesting things I found within this dataset was the average time spent in the hospital by race. There was not a great amount of variation within this data discovery. For example, the race with the shortest stay in the hospital was 4.41 days, where the longest stay was 6.17 days. The race with the longest stay in the hospital was actually “unknown” according to the data breakdown provided. The race with the shortest stay in the hospital was “Asian, not Hispanic”. I was also interested to find that male patients are older on average by about a year, 51.49 years old in comparison to female patients averaging 50.86 years old. I wonder if this finding can be linked to scientific hypotheses that women live long than men because they average more hospital visits at younger ages, hence proving they may have a higher degree of quality health care than men. 
+
+
+-------
+
+## II. Data Visualization
+
+Continue with the data from part I. 
+
+1. Provides at least 10 meaningful plots. Comments on the plots. All plots should have title, caption, appropriate labels on x and y-axis
+
+Plot 1
+```{r}
+df2 %>%
+  filter(season=='winter'|season=='summer'|season=='spring'|season=='fall') %>%
+  ggplot()+
+  geom_point(mapping = aes(x = moa, y = tot, color = season))+
+  labs(x='Month', 
+       y = 'Total Cost of Visit', 
+       title = 'Total Cost of Visit by Months and Seasons', 
+       caption = 'The winter months appear to have the most expensive hospital visits.')
+  
+```
+
+
+Plot 2
+```{r}
+df2 %>%
+  filter(raceethn=='3') %>%
+  ggplot()+
+  geom_point(mapping = aes(x = moa, y = los, color = season))+
+      labs(x='Month', 
+       y = 'Length of Stay', 
+       title = 'Asian length of Stay by Months and Seasons', 
+       caption = 'The winter months appear to have less outliers for asian lengths of hospital stays.')
+```
+
+
+Plot 3
+```{r}
+df2 %>%
+  filter(sex=='1') %>%
+  ggplot()+
+  geom_point(mapping = aes(x = moa, y = los, color = season))+
+    labs(x='Month', 
+       y = 'Length of Stay', 
+       title = 'Female length of Stay by Seasons', 
+       caption = 'The Spring months appear to have less outliers for female lengths of hospital stays.')
+```
+
+
+Plot 4
+```{r}
+df2 %>%
+  filter(admtype=='5') %>%
+  ggplot()+
+  geom_point(mapping = aes(x = season, y = los, color = season))+
+    labs(x='Season', 
+       y = 'Length of Stay', 
+       title = 'Length of Stay for Traumas by Season', 
+       caption = 'The are greater outliers for trauma hospital visit lengths in the summer months. Sports, outdoor activities, hiking, boating, etc.')
+```
+
+
+Plot 5
+```{r}
+df2 %>%
+  filter(tot<10000) %>%
+  ggplot()+
+  geom_density(mapping = aes(x = tot, color = admtype))+
+  labs(x='Total Cost of Stay (USD)', 
+       y = 'Density', 
+       title = 'Density of Total Cost by Admission Type', 
+       caption = 'The unknown admission type has the greatest variety with the cost of the stay.')
+```
+
+Plot 6
+```{r}
+df2 %>%
+  filter(tot<10000) %>%
+  ggplot()+
+  geom_density(mapping = aes(x = tot, color = raceethn))+
+  labs(x='Total Cost of Stay (USD)', 
+       y = 'Density', 
+       title = 'Density of Total Cost by Race', 
+       caption = 'Race #4, American Indian-Not Hispanic, has the highest cost per visit at their highest density.')
+```
+
+
+Plot 7
+```{r}
+df2 %>% 
+  filter(raceethn=='1') %>% 
+  ggplot()+
+  geom_bar(mapping = aes(x = admtype))+
+    labs(x='Type of Admission', 
+       y = 'Number of Admissions', 
+       title = 'Number and Type of Admissions for White patients', 
+       caption = 'The most common reason for admission among White patients is emergency visits.')
+```
+
+
+Plot 8
+```{r}
+df2 %>% 
+  filter(provider=='7215'|provider=='7214'|provider=='7205') %>%
+  ggplot()+
+  geom_line(mapping = aes(x = tot, y = los, color = provider))+
+  labs(x='Total Cost', 
+       y = 'Length of Stay', 
+       title = 'Total Cost of Stay by Length of Stay', 
+       caption = 'Rhode Island Hospital, Women and Infants, and Bradley all share a relationship that total cost rises as the length of stay increases.')
+  
+```
+
+
+Plot 9
+```{r}
+df2 %>% 
+  filter(admtype=='1'|admtype=='5'|admtype=='2') %>%
+  ggplot()+
+  geom_line(mapping = aes(x = tot, y = los, color = admtype))+
+  labs(x='Total Cost', 
+       y = 'Length of Stay', 
+       title = 'Total Cost of Stay by Length of Stay', 
+       caption = 'Emergency, Trauma, and Urgent admissions all share a relationship that total cost rises as the length of stay increases.')
+```
+
+
+Plot 10
+```{r}
+df2 %>%
+  filter(provider=='7205'|provider=='7214') %>%
+  ggplot()+
+  geom_bar(mapping = aes(x = admtype, fill = provider))+
+    labs(x='Admission Type', 
+       y = 'Number of Admissions', 
+       title = 'Proportion of Admission Type by Provider', 
+       caption = 'Rhode Island Hospital admits a significantly higher proportion of emergency cases than Women and Infants, where Women and Infants admit a high proportion of Newborn cases.')
+```
+
+
+2. Make an animation plot. 
+```{r}
+library(tidyverse)
+library(gganimate)
+p3 <- df2 %>% 
+    filter(provider %in% c('7214')) %>% 
+    ggplot(aes(y=tot,
+               x=los,
+               color=provider))+ 
+    geom_line()+
+    geom_point(size=3)+
+    geom_text(aes(label = tot), 
+              hjust = -.1, size=5) +
+    transition_reveal(tot)
+animate(p3)
+```
+
+
+3. Write a paragraph to summarize the section and give your comments on the results. 
+
+The multiple plots that I created in this section show relationships between many variables. The plot that I found most interesting was Plot #4, where it showed the relationship between emergency room admittances by season. I found this plot most interesting because of the difference between outliers in the summertime in comparison to other seasons. I think this is most interesting because it makes me think of why this may be happening, whether it be more outdoorsy accidents because of the weather like boating accidents, hiking injuries, sports accidents, etc.
+
+-------
+
+## III. Predictive Models
+
+Continue with the data from part I. Make sure you do not have any missing values in the data. Use the follows as the target and input variables: 
+
+*Target Variable*: Create the target variable taking value of 
+
+  - `low` if the total charge of a patient (`tot`) is smaller than the median of the total charge, and
+
+  - `high` otherwise. 
+
+*Input Variables*:
+
+  - "age","sex","raceethn","provider","moa","mod","admtype","campus", 'los'
+  
+-------
+
+1. Use `filter` function to filter out rows where `raceethn==''` or `admtype==''`. Make sure all the categorical variables are factor, numeric variables are numeric. Set Training : Testing Split = 10 : 90 
+```{r}
+library(tidyverse)
+df12 <-  select(df2,"age", "raceethn", "sex", "provider", "moa", "mod", "admtype", "campus", "los")
+
+df12$sex <- factor(df12$sex)
+df12$raceethn <- factor(df12$raceethn)
+df12$provider <- factor(df12$provider)
+df12$admtype <- factor(df12$admtype)
+df12$campus <- factor(df12$campus)
+
+
+
+df12$target <- cut(df2$tot, 
+                      breaks = c(-Inf, 218854,Inf), 
+                      labels=c('low','high'), na.rm=TRUE)
+
+library(caret)
+set.seed(2020)
+splitIndex <- createDataPartition(df2$tot, p = .10, 
+                                  list = FALSE)
+df12_train <- df12[ splitIndex, na.rm=TRUE]
+df12_test <- df12[-splitIndex, na.rm=TRUE]
+```
+
+
+2. Train a decision tree using `rpart`.  Plot the decision tree. Plot the variable importance ranked by the tree. 
+```{r}
+library(rpart)
+tree_model <- rpart(target ~ ., data = df12_train,
+                 control = rpart.control(maxdepth = 3))
+library(rattle)
+fancyRpartPlot(tree_model)
+tree_model$variable.importance
+barplot(tree_model$variable.importance)
+```
+
+
+3. Using caret for this question. Set `Training Control` to be: Use Cross-Validation of 5 folds across all models.  Train & tune at least 3 different models (i.e. three different values for `method=` in the train function of caret).  Plot the hyper-parameter tuning plots for each model. 
+```{r}
+library(tidyverse)
+library(rpart)
+library(caret)
+
+
+trControl = trainControl(method = "cv",
+                         number = 5)
+forest_ranger <- train(target~., data=df12_train, 
+                    method = "ranger", 
+                    trControl = trControl)
+tree <- train(target~., data=df12_train, 
+                                method = "rpart2", 
+                                trControl = trControl)
+knn <- train(target~., data=df12_train, 
+                                method = "knn", 
+                                trControl = trControl)
+
+results <- resamples(list('Decision Tree' = tree,
+                          'Random Forest' = forest_ranger,
+                          'KNN'= knn))
+bwplot(results)
+```
+
+4. Plot the comparison of the models in 3.
+
+
+Model is plotted above in Question 3. 
+
+
+5. What is your final selection for the model? Test the accuracy of your final model on the test data. 
+
+
+The random forest model method is the best option because the data is most similar. 
+
+
+6. Create another `target` variable (binary), decide the input variables and redo 1 to 5. 
+
+
+
+7. Write a paragraph to summarize the section and give your comments on the results. 
+
+-------
